@@ -36,6 +36,12 @@ const DashbordLayout = () => {
                         </li>
                         {/* Our Dashboard Links  */}
                         <li>
+                            <NavLink to='/dashboard/my-profile' > Profile</NavLink>
+                        </li>
+                        <li>
+                            <NavLink to='/dashboard/my-booking' > Booking</NavLink>
+                        </li>
+                        <li>
                             <NavLink to='/dashboard/my-parcels' > <FaBicycle /> </NavLink>
                         </li>
 

@@ -8,6 +8,7 @@ import Covarage from '../../Covarage/Covarage';
 import { useLoaderData } from 'react-router';
 import ServiceCard from '../../Service/ServiceCard';
 import axios from 'axios';
+import useAuth from '../../../Hooks/useAuth';
 
 
 
@@ -15,6 +16,8 @@ import axios from 'axios';
 const reviewsPrommise = fetch('/reviews.json').then(res => res.json())
 
 const Home = () => {
+    const {user}=useAuth()
+    console.log(user)
     const [decorators, setDecorators] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

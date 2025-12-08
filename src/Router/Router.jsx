@@ -16,6 +16,8 @@ import PaymentCancelled from "../Pages/Dashboard/Payment/PaymentCancelled";
 import Error from "../Pages/Error/Error";
 import Service from "../Pages/Service/Service";
 import ServiceDetails from "../Pages/Service/ServiceDetails";
+import Profile from "../Pages/Dashboard/Profile/Profile";
+import MyBooking from "../Pages/Dashboard/Booking/MyBooking";
 
 
 
@@ -79,6 +81,14 @@ export const router = createBrowserRouter([
         path: '/dashboard',
         element: <PrivateRoutes> <DashbordLayout></DashbordLayout> </PrivateRoutes>,
         children: [
+            {
+                path: 'my-profile',
+                Component: Profile
+            },
+            {
+                path: 'my-booking',
+                Component: MyBooking
+            },
             {
                 path: 'my-parcels',
                 Component: MyParcels
