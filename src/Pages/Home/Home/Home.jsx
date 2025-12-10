@@ -16,7 +16,7 @@ import useAuth from '../../../Hooks/useAuth';
 const reviewsPrommise = fetch('/reviews.json').then(res => res.json())
 
 const Home = () => {
-    const {user}=useAuth()
+    const { user } = useAuth()
     console.log(user)
     const [decorators, setDecorators] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -113,25 +113,37 @@ const Home = () => {
                 </div>
 
                 {/* Decorators Grid */}
-                <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 gap-8">
-                    {decorators.map(decorator => (
-                        <div
-                            key={decorator.id}
-                            className="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition duration-300"
-                        >
-                            <img
-                                src={decorator.image || "https://i.pinimg.com/736x/2c/31/01/2c31015d1d3df874992d5f90c4d9c1ab.jpg"}
-                                alt={decorator.name}
-                                className="w-full h-48 object-cover"
-                            />
-                            <div className="p-4">
-                                <h3 className="font-bold text-xl text-[#03373D] mb-2">{decorator.name}</h3>
-                                <p className="text-gray-700 mb-1"><span className="font-semibold">Specialty:</span> {decorator.specialties}</p>
-                                <p className="text-gray-700 mb-1"><span className="font-semibold">Rating:</span> {decorator.rating} ⭐</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    {decorators
+                        .filter(d => d.role === "decorator")   // 🔥 Just add this filter
+                        .map(decorator => (
+                            <div
+                                key={decorator._id}
+                                className="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition duration-300"
+                            >
+                                <img
+                                    src={decorator.photoURL || "https://i.pinimg.com/736x/2c/31/01/2c31015d1d3df874992d5f90c4d9c1ab.jpg"}
+                                    alt={decorator.displayName}
+                                    className="w-full h-48 object-cover"
+                                />
+
+                                <div className="p-4">
+                                    <h3 className="font-bold text-xl text-[#03373D] mb-2">
+                                        {decorator.displayName}
+                                    </h3>
+
+                                    <p className="text-gray-700 mb-1">
+                                        <span className="font-semibold">Specialty:</span> {decorator.skillCategory || "N/A"}
+                                    </p>
+
+                                    <p className="text-gray-700 mb-1">
+                                        <span className="font-semibold">Rating:</span> {decorator.rating || 0} ⭐
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
+
             </div>
 
             <Reviews reviewsPrommise={reviewsPrommise} ></Reviews>

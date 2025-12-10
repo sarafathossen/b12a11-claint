@@ -1,8 +1,10 @@
 import React from 'react';
 import { FaBicycle } from 'react-icons/fa';
 import { Link, NavLink, Outlet } from 'react-router';
+import useRole from '../Hooks/useRole';
 
 const DashbordLayout = () => {
+    const {role}=useRole();
     return (
         <div className="drawer lg:drawer-open">
             <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
@@ -40,10 +42,25 @@ const DashbordLayout = () => {
                         </li>
                         <li>
                             <NavLink to='/dashboard/my-booking' > Booking</NavLink>
+                            <NavLink to='/dashboard/aprove-decorator' > Aproove Decerator</NavLink>
                         </li>
                         <li>
                             <NavLink to='/dashboard/my-parcels' > <FaBicycle /> </NavLink>
                         </li>
+                        <li>
+                            <NavLink to='/dashboard/payment-history' > History</NavLink>
+                        </li>
+                        {
+                            role==='admin' && <>
+                                <li>
+                                    <NavLink to='/dashboard/user-management' > User Management</NavLink>    
+                                </li>
+                                <li>
+                                    <NavLink to='/dashboard/decorator-management' > Decorator Management</NavLink>    
+                                </li>
+                                
+                            </>
+                        }
 
                         {/* List item */}
                         <li>

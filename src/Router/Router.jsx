@@ -18,6 +18,11 @@ import Service from "../Pages/Service/Service";
 import ServiceDetails from "../Pages/Service/ServiceDetails";
 import Profile from "../Pages/Dashboard/Profile/Profile";
 import MyBooking from "../Pages/Dashboard/Booking/MyBooking";
+import BeDecorator from "../Pages/Decorator/BeDecorator";
+import AproveDecorator from "../Pages/Decorator/AproveDecorator";
+import PaymentHistory from "../Pages/Dashboard/PaymentHistory/PAymentHistory";
+import UserManagement from "../Pages/Dashboard/UserManagement/UserManagement";
+import AdminRoutes from "./AdminRoutes";
 
 
 
@@ -51,8 +56,8 @@ export const router = createBrowserRouter([
             },
 
             {
-                path: 'rider',
-                element: <PrivateRoutes> <Rider></Rider> </PrivateRoutes>
+                path: 'be-decorator',
+                element: <PrivateRoutes> <BeDecorator></BeDecorator> </PrivateRoutes>
             },
             {
                 path: 'send-percel',
@@ -102,8 +107,20 @@ export const router = createBrowserRouter([
                 Component: PaymentSuccess
             },
             {
+                path: 'payment-history',
+                Component: PaymentHistory
+            },
+            {
+                path: 'user-management',
+                element:<AdminRoutes> <UserManagement></UserManagement> </AdminRoutes>
+            },
+            {
                 path: 'payment-cancelled',
                 Component: PaymentCancelled
+            },
+            {
+                path: 'aprove-decorator',
+                element: <AdminRoutes> <AproveDecorator></AproveDecorator> </AdminRoutes>
             },
         ]
     },

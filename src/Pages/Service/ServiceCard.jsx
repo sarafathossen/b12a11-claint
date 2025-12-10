@@ -17,7 +17,7 @@ const ServiceCard = ({ service }) => {
             <img className='h-[300px] w-full' src='https://i.pinimg.com/736x/2c/31/01/2c31015d1d3df874992d5f90c4d9c1ab.jpg' alt={service.name} />
             <h2 className='text-xl font-bold'>{service.name}</h2>
             <div className="flex justify-between px-2">
-                <p className='font-bold'>{service.price}</p>
+                <p className='font-bold'>{service.price} Per Square </p>
                 <p className='font-bold text-green-600'>{service.category}</p>
             </div>
             <button

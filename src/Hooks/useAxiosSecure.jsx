@@ -1,22 +1,30 @@
 import axios from 'axios';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import useAuth from './useAuth';
 
-
 const axiosSecure = axios.create({
-    baseURL:'http://localhost:3000'
-})
+    baseURL: 'http://localhost:3000'
+});
 
 const useAxiosSecure = () => {
-    const {user}=useAuth()
-    useEffect(()=>{
-        axiosSecure.interceptors.request.use(config =>{
-            config.headers.Authorization=`Bearer ${user?.accessToken}`
-            return config
-        })
+    const { user } = useAuth();
 
-    },[user])
+    useEffect(() => {
+        const interceptor = axiosSecure.interceptors.request.use(
+            async (config) => {
+                if (user) {
+                    const token = await user.getIdToken(); // MUST NEED
+                    config.headers.Authorization = `Bearer ${token}`;
+                }
+                return config;
+            },
+            (error) => Promise.reject(error)
+        );
 
+        return () => {
+            axiosSecure.interceptors.request.eject(interceptor);
+        };
+    }, [user]);
 
     return axiosSecure;
 };

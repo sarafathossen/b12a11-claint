@@ -50,8 +50,8 @@ const NAvbar = () => {
                 </ul>
             </div>
             <div className="navbar-end">
-                 {
-                    user && <Link to='/dashboard' className="btn" >Dashboard</Link> 
+                {
+                    user && <Link to='/dashboard' className="btn" >Dashboard</Link>
                 }
                 {
                     user && <><details className="dropdown">
@@ -60,14 +60,15 @@ const NAvbar = () => {
                             <li> <Link className='btn'  >Profile</Link> </li>
                             {/* <li> <Link className='btn'  >Settings</Link> </li> */}
                             <li> <Link className='btn' onClick={handelLogOut}  >Log Out</Link> </li>
-                            
+
                         </ul>
                     </details></>
                 }
                 {
-                    user ?"": <Link className='btn' to='/login'>Log In </Link>
+                    user ? "" : <Link className='btn' to='/login'>Log In </Link>
                 }
-                {/* <Link className='btn btn-primary text-black' to='/rider'>Be a Rider</Link> */}
+
+                <Link className='btn btn-primary text-black' to='/be-decorator'>Be a Decorator</Link>
             </div>
         </div>
     );

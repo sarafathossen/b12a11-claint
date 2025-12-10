@@ -1,25 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useAuth from '../../../Hooks/useAuth';
 import useAxiosSecure from '../../../Hooks/useAxiosSecure';
 import { useQuery } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
 
 const MyBooking = () => {
-    const [selectedBooking, setSelectedBooking] = React.useState(null);
-    const [newDate, setNewDate] = React.useState("");
+    const [selectedBooking, setSelectedBooking] = useState(null);
+    const [newDate, setNewDate] = useState("");
+    const [squareFeet, setSquareFeet] = useState("");
 
     const { user } = useAuth();
     const axiosSecure = useAxiosSecure();
 
+    // === Fetch User Bookings ===
     const { data: bookings = [], refetch } = useQuery({
         queryKey: ['my-booking', user?.email],
         enabled: !!user?.email,
         queryFn: async () => {
             const res = await axiosSecure.get(`/booking?email=${user.email}`);
             return res.data;
-        }
+        },
     });
 
+    // === Delete Function ===
     const handelDelete = (id) => {
         Swal.fire({
             title: "Are you sure?",
@@ -28,43 +31,59 @@ const MyBooking = () => {
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!"
+            confirmButtonText: "Yes, delete it!",
         }).then((result) => {
             if (result.isConfirmed) {
-                axiosSecure.delete(`/booking/${id}`)
-                    .then(res => {
-                        if (res.data.deletedCount) {
-                            refetch();
-                            Swal.fire({
-                                title: "Deleted!",
-                                text: "Your booking has been deleted.",
-                                icon: "success"
-                            });
-                        }
-                    });
+                axiosSecure.delete(`/booking/${id}`).then((res) => {
+                    if (res.data.deletedCount) {
+                        refetch();
+                        Swal.fire({
+                            title: "Deleted!",
+                            text: "Your booking has been deleted.",
+                            icon: "success",
+                        });
+                    }
+                });
             }
         });
     };
 
+    // === Payment ===
     const handelPayment = async (service) => {
+        // Ensure price is number
+        const cost = typeof service.price === 'string'
+            ? parseInt(service.price.replace(/[^0-9]/g, ""))
+            : service.price || service.finalCost;
+
         const paymentInfo = {
-            cost: parseInt(service.price.replace(/[^0-9]/g, "")),
+            cost: cost,
             parcelId: service._id,
-            
             userEmail: service.userEmail,
             parcelName: service.serviceName,
         };
 
         try {
             const res = await axiosSecure.post('/payment-checkout-session', paymentInfo);
+            console.log("Stripe Checkout URL:", res.data.url);
             window.location.assign(res.data.url);
         } catch (err) {
             console.error("Payment Error:", err);
-            alert("Payment could not be processed. Check console.");
+            alert("Payment could not be processed.");
         }
-        console.log(service)
     };
-   
+
+    //  const handelPayment = async (parcel) => {
+    //     const paymentInfo = {
+    //         cost: parcel.cost,
+    //         parcelId: parcel._id,
+    //         senderEmail: parcel.senderEmail,
+    //         parcelName: parcel.parcelName,
+    //     }
+    //     const res = await axiosSecure.post('/payment-checkout-session', paymentInfo)
+    //     console.log(res.data.url)
+    //     window.location.assign(res.data.url)
+
+    // }
 
     return (
         <div>
@@ -72,6 +91,7 @@ const MyBooking = () => {
                 My Booked Services: {bookings.length}
             </h2>
 
+            {/* === Table === */}
             <div className="overflow-x-auto">
                 <table className="table table-zebra">
                     <thead>
@@ -89,30 +109,36 @@ const MyBooking = () => {
                             <tr key={service._id}>
                                 <th>{index + 1}</th>
                                 <td>{service.serviceName}</td>
-                                <td>{service.price}</td>
+                                <td>{service.finalCost}</td>
+
                                 <td>
-                                    {service.paymentStatus === 'paid'
-                                        ? <span className="text-green-500 font-medium">Paid</span>
-                                        : <button
+                                    {service.paymentStatus === "paid" ? (
+                                        <span className="text-green-500 font-medium">Paid</span>
+                                    ) : (
+                                        <button
                                             onClick={() => handelPayment(service)}
                                             className="btn btn-sm btn-primary text-black"
                                         >
                                             Pay
                                         </button>
-                                    }
+                                    )}
                                 </td>
+
                                 <td className="flex gap-2">
+                                    {/* Update Button */}
                                     <button
                                         onClick={() => {
                                             setSelectedBooking(service);
-                                            setNewDate(service.bookedDate || service.bookingDate); // আগের ডেটা newDate-এ সেট
-                                            document.getElementById('my_modal_5').showModal();
+                                            setNewDate(service.bookedDate);
+                                            setSquareFeet(service.squareFeet || "");
+                                            document.getElementById("my_modal_5").showModal();
                                         }}
                                         className="btn btn-xs btn-outline"
                                     >
                                         Update
                                     </button>
 
+                                    {/* Delete Button */}
                                     <button
                                         onClick={() => handelDelete(service._id)}
                                         className="btn btn-xs btn-error text-white"
@@ -126,97 +152,129 @@ const MyBooking = () => {
                 </table>
             </div>
 
-            {/* Modal */}
+            {/* === Modal === */}
             <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
                 <div className="modal-box">
-                    <h3 className="font-bold text-lg mb-2">Booking Details (You can change only Booked Date) </h3>
+                    <h3 className="font-bold text-lg mb-2">
+                        Booking Details (Only Booked Date & SquareFeet Editable)
+                    </h3>
 
                     {selectedBooking && (
-                        <div className="space-y-2 text-sm">
-
+                        <div className="space-y-3 text-sm">
                             <p><strong>Service:</strong> {selectedBooking.serviceName}</p>
-                            <p><strong>Price:</strong> {selectedBooking.price}</p>
+                            <p><strong>Price:</strong> {selectedBooking.price} Per Square </p>
                             <p><strong>Category:</strong> {selectedBooking.category}</p>
                             <p><strong>Duration:</strong> {selectedBooking.duration}</p>
-                            <p>
-                                <strong>Booking Date:</strong>{" "}
-                                {selectedBooking.bookingDate
-                                    ? selectedBooking.bookingDate.split("-").reverse().join("-")
-                                    : ""}
-                            </p>
-                            <p><strong>Payment Status:</strong> {selectedBooking.paymentStatus}</p>
-                            <p><strong>Tracking ID:</strong> {selectedBooking.trackingId}</p>
                             <p><strong>User Email:</strong> {selectedBooking.userEmail}</p>
+                            <p><strong>Payment:</strong> {selectedBooking.paymentStatus}</p>
 
-                            {/* Editable "Booked For" */}
-                            {/* <label className="block">
-                                <strong>Booking For:</strong>
+                            {/* Square Feet */}
+                            <label>
+                                <strong>Square Feet:</strong>
+                                <input
+                                    type="number"
+                                    placeholder="Enter size in sq.ft"
+                                    value={squareFeet}
+                                    onChange={(e) => setSquareFeet(e.target.value)}
+                                    className="input input-bordered w-full mt-1"
+                                    min="0"
+                                />
+                            </label>
+
+                            {/* Booking Date */}
+                            <label>
+                                <strong>New Booked Date:</strong>
                                 <input
                                     type="date"
                                     className="input input-bordered w-full mt-1"
-                                    value={newDate} // সরাসরি newDate ব্যবহার
-                                    onChange={(e) => setNewDate(e.target.value)} // newDate আপডেট হচ্ছে
-                                    min={new Date().toISOString().split("T")[0]} // আজকের তারিখ থেকে ফিউচার
+                                    value={newDate}
+                                    onChange={(e) => setNewDate(e.target.value)}
+                                    min={new Date().toISOString().split("T")[0]}
                                 />
-                            </label> */}
-
-
-                            <input
-                                type="date"
-                                className="input input-bordered w-full mt-1"
-                                value={
-                                    selectedBooking.bookedDate
-                                        ? selectedBooking.bookedDate.split("-").reverse().join("-") // "DD-MM-YYYY" → "YYYY-MM-DD"
-                                        : ""
-                                }
-                               onChange={(e) => setNewDate(e.target.value)}
-                                min={new Date().toISOString().split("T")[0]} // আজকের তারিখ থেকে ফিউচার
-                            />
-
-
+                            </label>
                         </div>
                     )}
 
+                    {/* ===== Modal Action ===== */}
                     <div className="modal-action">
                         <button
                             className="btn btn-success"
                             onClick={async () => {
                                 try {
-                                    const res = await axiosSecure.patch(
-                                        `/booking/${selectedBooking._id}`,
-                                        {
-                                            bookedDate: newDate
-                                                ? newDate.split("-").reverse().join("-")
-                                                : selectedBooking.bookedDate,
-                                        }
+                                    if (!selectedBooking) {
+                                        Swal.fire({ title: "Error", text: "No booking selected.", icon: "error" });
+                                        return;
+                                    }
+
+                                    // Validate squareFeet
+                                    const sfNum = Number(squareFeet);
+                                    if (isNaN(sfNum) || sfNum < 0) {
+                                        Swal.fire({ title: "Invalid", text: "Square feet must be a positive number.", icon: "warning" });
+                                        return;
+                                    }
+
+                                    // Date from input is YYYY-MM-DD already (browser date input)
+                                    const formattedDate = newDate || selectedBooking.bookedDate;
+                                    // quick local check
+                                    if (!formattedDate) {
+                                        Swal.fire({ title: "Invalid", text: "Please select a date.", icon: "warning" });
+                                        return;
+                                    }
+
+                                    // Get numeric price from selectedBooking (fallback)
+                                    const purePrice = parseInt(
+                                        (selectedBooking.price && String(selectedBooking.price).replace(/[^0-9]/g, "")) ||
+                                        selectedBooking.finalCost ||
+                                        0
                                     );
 
-                                    if (res.data.modifiedCount > 0) {
-                                        Swal.fire({
-                                            title: "Updated!",
-                                            text: "Booking date updated successfully.",
-                                            icon: "success",
-                                        });
+                                    if (!purePrice) {
+                                        Swal.fire({ title: "Error", text: "Cannot determine service price.", icon: "error" });
+                                        return;
+                                    }
+
+                                    const updatedFinalCost = sfNum * Number(purePrice);
+
+                                    const payload = {
+                                        bookedDate: formattedDate,
+                                        squareFeet: sfNum,
+                                        finalCost: updatedFinalCost,
+                                    };
+
+                                    console.log('PATCH payload:', payload);
+
+                                    const res = await axiosSecure.patch(`/booking/${selectedBooking._id}`, payload);
+
+                                    console.log('PATCH response:', res);
+
+                                    if (res.data && res.data.modifiedCount > 0) {
+                                        Swal.fire({ title: "Updated!", text: "Booking updated successfully.", icon: "success" });
                                         refetch();
                                         document.getElementById("my_modal_5").close();
+                                    } else {
+                                        // show server message if any
+                                        const msg = res.data?.error || "No changes made.";
+                                        Swal.fire({ title: "Notice", text: msg, icon: "info" });
                                     }
-                                } catch (error) {
-                                    console.error(error);
+                                } catch (err) {
+                                    console.error('Update error (frontend):', err);
+                                    // If server responded with JSON error, try show it
+                                    const serverMessage = err?.response?.data?.error || err.message;
+                                    Swal.fire({ title: "Error", text: serverMessage, icon: "error" });
                                 }
                             }}
                         >
                             Update
                         </button>
 
+
                         <form method="dialog">
                             <button className="btn">Close</button>
                         </form>
                     </div>
+
                 </div>
             </dialog>
-
-
-
         </div>
     );
 };

@@ -1,9 +1,11 @@
 import React from 'react';
 import useAuth from '../../../Hooks/useAuth';
 import { useNavigate } from 'react-router';
+import useAxiosSecure from '../../../Hooks/useAxiosSecure';
 
 const SocialLogin = ({ redirectPath = '/' }) => {  // <-- redirectPath prop
     const { signInGoogle } = useAuth();
+    const axiosSecure = useAxiosSecure()
     const navigate = useNavigate();
 
     const handelGooglesignIn = () => {
@@ -11,7 +13,18 @@ const SocialLogin = ({ redirectPath = '/' }) => {  // <-- redirectPath prop
             .then(result => {
                 console.log(result);
                 // login successful → redirect to the given path
-                navigate(redirectPath, { replace: true });
+
+
+                const userInfo = {
+                    displayName: result.user.displayName,
+                    email: result.user.email,
+                    photoURL: result.user.photoURL,
+                };
+                axiosSecure.post('/users', userInfo)
+                    .then(res => {
+                        console.log('User info saved to database', res.data);
+                        navigate(redirectPath, { replace: true });
+                    });
             })
             .catch(error => {
                 console.log(error);
