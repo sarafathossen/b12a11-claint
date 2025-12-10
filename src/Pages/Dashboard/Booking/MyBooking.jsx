@@ -50,27 +50,44 @@ const MyBooking = () => {
 
     // === Payment ===
     const handelPayment = async (service) => {
-        // Ensure price is number
-        const cost = typeof service.price === 'string'
-            ? parseInt(service.price.replace(/[^0-9]/g, ""))
-            : service.price || service.finalCost;
+
+        // Safely extract and normalize final cost
+        const rawCost = service?.finalCost;
+
+        // Convert cost safely from string/number → number
+        const cost = Number(
+            typeof rawCost === "string"
+                ? rawCost.replace(/[^\d]/g, "")
+                : rawCost
+        ) || 0; // fallback in case of NaN
+
+        // Ensure cost is valid
+        if (cost <= 0) {
+            alert("Invalid price. Cannot proceed to payment.");
+            return;
+        }
 
         const paymentInfo = {
-            cost: cost,
-            parcelId: service._id,
-            userEmail: service.userEmail,
-            parcelName: service.serviceName,
+            cost,
+            parcelId: service?._id,
+            userEmail: service?.userEmail,
+            parcelName: service?.serviceName,
         };
 
         try {
-            const res = await axiosSecure.post('/payment-checkout-session', paymentInfo);
-            console.log("Stripe Checkout URL:", res.data.url);
-            window.location.assign(res.data.url);
+            const { data } = await axiosSecure.post("/payment-checkout-session", paymentInfo);
+
+            if (!data?.url) {
+                throw new Error("Checkout URL missing");
+            }
+
+            window.location.assign(data.url);
         } catch (err) {
-            console.error("Payment Error:", err);
-            alert("Payment could not be processed.");
+            console.error("Payment Error:", err.response?.data || err.message);
+            alert("Payment could not be processed. Please try again.");
         }
     };
+
 
     //  const handelPayment = async (parcel) => {
     //     const paymentInfo = {
@@ -100,6 +117,8 @@ const MyBooking = () => {
                             <th>Service Name</th>
                             <th>Price</th>
                             <th>Payment</th>
+                            <th>Tracking ID</th>
+                            <th>Work Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -123,6 +142,8 @@ const MyBooking = () => {
                                         </button>
                                     )}
                                 </td>
+                                <td>{service.trackingId}</td>
+                                <td>{service.workingStatus}</td>
 
                                 <td className="flex gap-2">
                                     {/* Update Button */}

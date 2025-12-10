@@ -7,19 +7,16 @@ const useRole = () => {
     const { user } = useAuth();
     const axiosSecure = useAxiosSecure();
 
-    const { isLoading:roleLoading, data } = useQuery({
-        enabled: !!user?.email, // user না থাকলে query চলবে না
+    const { isLoading: roleLoading, data: role } = useQuery({
+        enabled: !!user?.email,
         queryKey: ['user-role', user?.email],
         queryFn: async () => {
             const res = await axiosSecure.get(`/users/${user?.email}/role`);
-            return res.data?.role || 'user';
+            return res.data?.role || 'user'; 
         }
     });
 
-    // যদি API role না দেয় তবে default 'user'
-    const role = data?.role || 'user';
-
-    return { role, roleLoading };
+    return { role: role || 'user', roleLoading };
 };
 
 export default useRole;
