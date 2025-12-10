@@ -23,6 +23,7 @@ import AproveDecorator from "../Pages/Decorator/AproveDecorator";
 import PaymentHistory from "../Pages/Dashboard/PaymentHistory/PAymentHistory";
 import UserManagement from "../Pages/Dashboard/UserManagement/UserManagement";
 import AdminRoutes from "./AdminRoutes";
+import AssignDeceretors from "../Pages/Dashboard/AssignDeceretor/AssignDeceretors";
 
 
 
@@ -121,6 +122,10 @@ export const router = createBrowserRouter([
             {
                 path: 'aprove-decorator',
                 element: <AdminRoutes> <AproveDecorator></AproveDecorator> </AdminRoutes>
+            },
+            {
+                path: 'assign-decorator',
+                element: <AdminRoutes> <AssignDeceretors></AssignDeceretors> </AdminRoutes>
             },
         ]
     },

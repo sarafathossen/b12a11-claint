@@ -56,9 +56,12 @@ const DashbordLayout = () => {
                                     <NavLink to='/dashboard/user-management' > User Management</NavLink>    
                                 </li>
                                 <li>
+                                    <NavLink to='/dashboard/assign-decorator' > Assign Decorators</NavLink>    
+                                </li>
+                                <li>
                                     <NavLink to='/dashboard/decorator-management' > Decorator Management</NavLink>    
                                 </li>
-                                
+
                             </>
                         }
 
