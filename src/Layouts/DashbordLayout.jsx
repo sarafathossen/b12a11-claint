@@ -69,6 +69,9 @@ const DashbordLayout = () => {
                         <li>
                             <NavLink to='/dashboard/assign-service' >Assign Service</NavLink>
                         </li>
+                        <li>
+                            <NavLink to='/dashboard/completed-booking' >Complite Booking</NavLink>
+                        </li>
 
 
 

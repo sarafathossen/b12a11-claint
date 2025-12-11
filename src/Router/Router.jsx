@@ -25,6 +25,7 @@ import UserManagement from "../Pages/Dashboard/UserManagement/UserManagement";
 import AdminRoutes from "./AdminRoutes";
 import AssignDeceretors from "../Pages/Dashboard/AssignDeceretor/AssignDeceretors";
 import AssignService from "../Pages/Dashboard/AssignService/AssignService";
+import CompeleteBooking from "../Pages/Dashboard/CompeleteBooking/CompeleteBooking";
 
 
 
@@ -131,6 +132,10 @@ export const router = createBrowserRouter([
             {
                 path: 'assign-service',
                 element: <AssignService></AssignService>
+            },
+            {
+                path: 'completed-booking',
+                element: <CompeleteBooking></CompeleteBooking>
             },
         ]
     },
