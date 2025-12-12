@@ -73,6 +73,7 @@ const MyBooking = () => {
             parcelId: service?._id,
             userEmail: service?.userEmail,
             parcelName: service?.serviceName,
+            trackingId:service?.trackingId,
         };
 
         try {
