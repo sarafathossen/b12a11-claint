@@ -86,7 +86,7 @@ const Home = () => {
             {/* How It Works */}
             <div className="py-10 px-4">
                 <h2 className="text-xl sm:text-2xl font-bold text-secondary text-center mb-8">
-                    How We Works gggggggggg
+                    How We Works
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl mx-auto">
